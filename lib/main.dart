@@ -24,7 +24,7 @@ class RecipeBook extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 1, // Number of tabs
+      length: 1,
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.orange, 
