@@ -1,15 +1,40 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:platzi/screens/recipe_detail.dart';
+import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+  Future<List<dynamic>> fetchRecipes() async {
+    // Android 10.0.2.2
+    final url = Uri.parse('http://10.0.2.2:3001/recipes');
+    final response = await http.get(url);
+    final data = json.decode(response.body);
+    if (response.statusCode == 200) {
+      return data['recipes'];
+    } else {
+      throw Exception('Failed to load recipes');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    fetchRecipes();
     return Scaffold(
-      body:Column(children: <Widget>[
-        _RecioesCard(context),
-        _RecioesCard(context),
-      ]),
+      body:FutureBuilder<List<dynamic>>(
+        future: fetchRecipes(), 
+        builder: (context, snapshot){
+          final recipes = snapshot.data ?? [];
+          return ListView.builder(
+            itemCount: recipes.length,
+            itemBuilder: (context, index) {
+              return _RecioesCard(context, recipes[index]);
+            },
+          );
+        }
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Action to perform when the button is pressed
@@ -37,48 +62,62 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _RecioesCard(BuildContext context){
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        height: 125,
-        child:Card(
-          child: Row(
-            children: <Widget>[
-              Container(
-                height: 125,
-                width: 100,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(
-                    'assets/images/lasagna.jpg',
-                    fit: BoxFit.cover, 
-                  )
-                )                ,
-              ),
-              SizedBox(width: 26,),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    'Lasagna', 
-                    style: TextStyle(
-                      fontSize: 17, 
-                      fontWeight: FontWeight.bold, 
-                      fontFamily: 'QuickSand')),
-                  SizedBox(height: 5,),
-                  Container(height: 2, width: 75, color: Colors.orange),
-                  SizedBox(height: 5,),
-                  Text('Carlos G', style: TextStyle(
-                    fontFamily: 'QuickSand'
-                  )),
-                ]
-              ),
-            ],
+  Widget _RecioesCard(BuildContext context, dynamic recipe){
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => RecipeDetail(
+            recipeName: 'Lasagna'
+          )),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: 125,
+          child:Card(
+            child: Row(
+              children: <Widget>[
+                Container(
+                  height: 125,
+                  width: 100,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    // child: Image.asset(
+                    //   recipe['image_link'],
+                    //   fit: BoxFit.cover, 
+                    // )
+                    child: Image.network(
+                      recipe['image_link'],
+                      fit: BoxFit.cover,
+                    ),
+                  )                ,
+                ),
+                SizedBox(width: 26,),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      recipe['name'],
+                      style: TextStyle(
+                        fontSize: 17, 
+                        fontWeight: FontWeight.bold, 
+                        fontFamily: 'QuickSand')),
+                    SizedBox(height: 5,),
+                    Container(height: 2, width: 75, color: Colors.orange),
+                    SizedBox(height: 5,),
+                    Text(recipe['author'], style: TextStyle(
+                      fontFamily: 'QuickSand'
+                    )),
+                  ]
+                ),
+              ],
+            )
           )
-        )
+        ),
       ),
     );
   }
