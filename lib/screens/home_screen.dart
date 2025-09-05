@@ -1,38 +1,40 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:platzi/providers/ricipes_provider.dart';
 import 'package:platzi/screens/recipe_detail.dart';
-import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  Future<List<dynamic>> fetchRecipes() async {
-    // Android 10.0.2.2
-    final url = Uri.parse('http://10.0.2.2:3001/recipes');
-    final response = await http.get(url);
-    final data = json.decode(response.body);
-    if (response.statusCode == 200) {
-      return data['recipes'];
-    } else {
-      throw Exception('Failed to load recipes');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    fetchRecipes();
+    final recipesProvider = Provider.of<RecipesProvider>(context, listen: false);
+    recipesProvider.fetchRecipes();
+
     return Scaffold(
-      body:FutureBuilder<List<dynamic>>(
-        future: fetchRecipes(), 
-        builder: (context, snapshot){
-          final recipes = snapshot.data ?? [];
-          return ListView.builder(
-            itemCount: recipes.length,
-            itemBuilder: (context, index) {
-              return _RecioesCard(context, recipes[index]);
-            },
-          );
+      body:Consumer<RecipesProvider>(
+        builder: (context, provider, child){
+          if(provider.isLoading){
+            return Center(child: CircularProgressIndicator());
+          } 
+          else if (provider.recipes.isEmpty) {
+            return Center(
+              child: Text(
+                'No recipes found',
+                style: TextStyle(fontSize: 20, fontFamily: 'Quicksand'),
+              ),
+            );
+          } else {
+            return ListView.builder(
+              itemCount: provider.recipes.length,
+              itemBuilder: (context, index) {
+                return _RecioesCard(context, provider.recipes[index]);
+              },
+            );
+          }
         }
       ),
       floatingActionButton: FloatingActionButton(
@@ -90,7 +92,8 @@ class HomeScreen extends StatelessWidget {
                     //   fit: BoxFit.cover, 
                     // )
                     child: Image.network(
-                      recipe['image_link'],
+                      // recipe['image_link'],
+                      recipe.image_link,
                       fit: BoxFit.cover,
                     ),
                   )                ,
@@ -101,7 +104,8 @@ class HomeScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      recipe['name'],
+                      // recipe['name'],
+                      recipe.name,
                       style: TextStyle(
                         fontSize: 17, 
                         fontWeight: FontWeight.bold, 
@@ -109,7 +113,7 @@ class HomeScreen extends StatelessWidget {
                     SizedBox(height: 5,),
                     Container(height: 2, width: 75, color: Colors.orange),
                     SizedBox(height: 5,),
-                    Text(recipe['author'], style: TextStyle(
+                    Text(recipe.author, style: TextStyle(
                       fontFamily: 'QuickSand'
                     )),
                   ]
