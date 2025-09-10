@@ -9,7 +9,7 @@ class RecipesProvider extends ChangeNotifier {
   List<Recipe> recipes = [];
   Future<void> fetchRecipes() async {
     isLoading = true;
-    notifyListeners();
+    
 
     // Android 10.0.2.2
     final url = Uri.parse('http://10.0.2.2:3001/recipes');

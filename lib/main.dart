@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:platzi/providers/ricipes_provider.dart';
+import 'package:platzi/screens/favorites_recipes.dart';
 import 'package:platzi/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -31,7 +32,7 @@ class RecipeBook extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 1,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.orange, 
@@ -42,12 +43,13 @@ class RecipeBook extends StatelessWidget {
             unselectedLabelColor: Colors.white70,
             tabs: [
               Tab(icon: Icon(Icons.home), text: 'Home'),
+              Tab(icon: Icon(Icons.favorite), text: 'Favorites'),
             ],
           ),
         ),
         
         body: TabBarView(
-          children: [HomeScreen()],
+          children: [HomeScreen(), FacoritesRecipes()],
         ),
       ),
     );

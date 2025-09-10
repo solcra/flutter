@@ -95,6 +95,16 @@ class HomeScreen extends StatelessWidget {
                       // recipe['image_link'],
                       recipe.image_link,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[300],
+                          child: Icon(
+                            Icons.broken_image,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
+                        );
+                      },
                     ),
                   )                ,
                 ),
