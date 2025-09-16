@@ -70,7 +70,7 @@ class HomeScreen extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => RecipeDetail(
-            recipeName: 'Lasagna'
+            recipesDarta: recipe,
           )),
         );
       },
